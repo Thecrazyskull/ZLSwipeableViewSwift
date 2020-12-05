@@ -186,15 +186,20 @@ class ViewManager : NSObject {
         anchorView.isHidden = true
         
         // attach aView to anchorView
-        let p = view.center
-        viewToAnchorViewAttachmentBehavior = UIAttachmentBehavior(item: view, offsetFromCenter: UIOffset(horizontal: -(p.x - point.x), vertical: -(p.y - point.y)), attachedTo: anchorView, offsetFromCenter: UIOffset.zero)
-        viewToAnchorViewAttachmentBehavior!.length = 0
+        let viewCenter = view.center
+        if #available(iOS 9.0, *) {
+            viewToAnchorViewAttachmentBehavior = UIAttachmentBehavior.pinAttachment(with: view, attachedTo: anchorView, attachmentAnchor: point)
+            viewToAnchorViewAttachmentBehavior.attachmentRange = UIFloatRange(minimum: 0, maximum: 0.05)
+        } else {
+            viewToAnchorViewAttachmentBehavior = UIAttachmentBehavior(item: view, offsetFromCenter: UIOffset(horizontal: -(viewCenter.x - point.x), vertical: -(viewCenter.y - point.y)), attachedTo: anchorView, offsetFromCenter: UIOffset.zero)
+        }
+        viewToAnchorViewAttachmentBehavior.length = 0
         
         // attach anchorView to point
         anchorViewToPointAttachmentBehavior = UIAttachmentBehavior(item: anchorView, offsetFromCenter: UIOffset.zero, attachedToAnchor: point)
-        anchorViewToPointAttachmentBehavior!.damping = 100
-        anchorViewToPointAttachmentBehavior!.length = 0
-        
+        anchorViewToPointAttachmentBehavior.damping = 100
+        anchorViewToPointAttachmentBehavior.length = 0
+
         addBehavior(viewToAnchorViewAttachmentBehavior!)
         addBehavior(anchorViewToPointAttachmentBehavior!)
     }
